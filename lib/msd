@@ -1,0 +1,53 @@
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+  );
+  await Hive.initFlutter();
+  await Hive.openBox("Habit_Database");
+  runApp(MyApp());
+}
+
+Color brandColor = const Color.fromARGB(255, 255, 0, 0);
+
+class MyApp extends StatelessWidget {
+  MyApp({Key? key}) : super(key: key);
+
+  final GlobalController globalController =
+      Get.put(GlobalController(), permanent: true);
+  // This widget is the root of your application.
+
+  @override
+  Widget build(BuildContext context) {
+    return DynamicColorBuilder(
+        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+      ColorScheme lightColorScheme;
+      ColorScheme darkColorScheme;
+
+      if (lightDynamic != null && darkDynamic != null) {
+        lightColorScheme = lightDynamic.harmonized()..copyWith();
+        darkColorScheme = darkDynamic.harmonized();
+        useMaterial3: true,
+      } else {
+        lightColorScheme = ColorScheme.fromSeed(seedColor: brandColor);
+        darkColorScheme = ColorScheme.fromSeed(
+          seedColor: brandColor,
+          brightness: Brightness.dark,
+          useMaterial3: true,
+        );
+      }
+
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: lightColorScheme,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: darkColorScheme,
+        ),
+        home: const HomeScreen(),
+      );
+    });
+  }
+}
